@@ -7,17 +7,22 @@ if [[ $EUID -ne 0 ]]; then
 	clear
 	echo "Pimusic Installation"
 	echo ""
+  echo "Identifying the Raspbian version"
+  RASPBIAN=$(lsb_release -cs)
+  echo "You are on raspbian $RASPBIAN"
+  echo ""
 	echo "Preparing the System for Installation"
 	echo ""
 	echo "Adding needed Keys."
+
 	# Spotify Key
 	curl -sSL https://dtcooper.github.io/raspotify/key.asc | sudo apt-key add -v -
 	echo 'deb https://dtcooper.github.io/raspotify raspotify main' | sudo tee /etc/apt/sources.list.d/raspotify.list
-	
+
 	# Mopidy Key
 	wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
-	sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/stretch.list
-	
+	sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/"$RASPBIAN".list
+
 	# Get updates
 	clear
 	echo "Updating System"
@@ -25,7 +30,7 @@ if [[ $EUID -ne 0 ]]; then
 	sudo apt-get update
 	sudo apt-get -y upgrade
 	sudo apt -y autoremove
-	# Install needed packages 
+	# Install needed packages
 	echo "Getting needed Packages"
 	echo ""
 	sudo apt-get -y install wget gstreamer1.0-plugins-bad gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 python-gst-1.0 python-dev python-pip curl alsa-base alsa-utils bluealsa bluez bluez-firmware python-gobject python-dbus mpg123 autotools-dev apt-transport-https dh-autoreconf git xmltoman autoconf automake libtool libpopt-dev libconfig-dev libasound2-dev avahi-daemon libavahi-client-dev libssl-dev libsoxr-dev
@@ -58,25 +63,25 @@ if [[ $EUID -ne 0 ]]; then
 	systemctl enable shairport-sync
 	systemctl start shairport-sync
 
-	# Mopidy script 
+	# Mopidy script
 	clear
 	echo "Installing Mopidy Support"
 	echo ""
 	sudo apt-get -y install mopidy
 	sudo systemctl enable mopidy
-	
+
 	# Mopidy Spotify
 	clear
 	sudo apt-get install -y mopidy-spotify
-	
+
 	# Mopidy Soundcloud
 	clear
 	sudo apt-get install mopidy-soundcloud
-	
+
 	# Mopidy Scrobbler
 	clear
 	pip install Mopidy-Scrobbler
-	
+
 	# Mopidy Tunein
 	clear
 	pip install Mopidy-TuneIn
